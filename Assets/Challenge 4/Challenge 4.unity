@@ -717,7 +717,7 @@ MonoBehaviour:
   hasPowerup: 0
   powerupIndicator: {fileID: 1427939658}
   powerUpDuration: 5
-  smashShield: {fileID: 0}
+  smashShield: {fileID: 1065180698}
   smashJumpForce: 15
   smashDownForce: 30
   smashRadius: 20
