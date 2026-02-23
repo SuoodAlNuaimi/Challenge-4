@@ -6,6 +6,7 @@ public class SpawnManagerX : MonoBehaviour
 {
     public GameObject enemyPrefab;
     public GameObject powerupPrefab;
+    public GameObject smashPowerupPrefab;
 
     private float spawnRangeX = 10;
     private float spawnZMin = 15; // set min spawn Z
@@ -14,7 +15,7 @@ public class SpawnManagerX : MonoBehaviour
     public int enemyCount;
     public int waveCount = 1;
 
-    public float enemySpeed = 50;
+    public float enemySpeed = 25;
 
 
     public GameObject player; 
@@ -48,6 +49,11 @@ public class SpawnManagerX : MonoBehaviour
         if (GameObject.FindGameObjectsWithTag("Powerup").Length == 0) // check that there are zero powerups
         {
             Instantiate(powerupPrefab, GenerateSpawnPosition() + powerupSpawnOffset, powerupPrefab.transform.rotation);
+        }
+
+        if (GameObject.FindGameObjectsWithTag("SmashPowerup").Length == 0)
+        {
+            Instantiate(smashPowerupPrefab, GenerateSpawnPosition() + powerupSpawnOffset, smashPowerupPrefab.transform.rotation);
         }
 
         // Spawn number of enemy balls based on wave number

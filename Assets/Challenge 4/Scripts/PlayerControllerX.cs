@@ -12,14 +12,26 @@ public class PlayerControllerX : MonoBehaviour
     public GameObject powerupIndicator;
     public int powerUpDuration = 5;
 
+    public GameObject smashShield;
+
     private float normalStrength = 10; // how hard to hit enemy without powerup
     private float powerupStrength = 25; // how hard to hit enemy with powerup
 
     private float turboBoost = 10;
+
+    [SerializeField] private float smashJumpForce = 15f;
+    [SerializeField] private float smashDownForce = 30f;
+    [SerializeField] private float smashRadius = 20f;
+    [SerializeField] private float smashForce = 40f;
+
+    private bool hasSmashPowerup = false;
+    private bool isSmashing = false;
+
     public ParticleSystem turboSmoke;
     
     void Start()
     {
+        smashShield.SetActive(false);
         playerRb = GetComponent<Rigidbody>();
         focalPoint = GameObject.Find("Focal Point");
 
@@ -28,6 +40,13 @@ public class PlayerControllerX : MonoBehaviour
 
     void Update()
     {
+
+        if (smashShield.activeSelf)
+        {
+            float scale = 1.8f + Mathf.Sin(Time.time * 5f) * 0.1f;
+            smashShield.transform.localScale = new Vector3(scale, scale, scale);
+        }
+
         // Add force to player in direction of the focal point (and camera)
         float verticalInput = Input.GetAxis("Vertical");
         playerRb.AddForce(focalPoint.transform.forward * verticalInput * speed * Time.deltaTime); 
@@ -42,6 +61,11 @@ public class PlayerControllerX : MonoBehaviour
             
         }
 
+        if (hasSmashPowerup && Input.GetKeyDown(KeyCode.F) && !isSmashing)
+        {
+            StartCoroutine(SmashAttack());
+        }
+
     }
 
 
@@ -49,6 +73,14 @@ public class PlayerControllerX : MonoBehaviour
     // If Player collides with powerup, activate powerup
     private void OnTriggerEnter(Collider other)
     {
+
+        if (other.CompareTag("SmashPowerup"))
+        {
+            smashShield.SetActive(true);
+            hasSmashPowerup = true;
+            Destroy(other.gameObject);
+        }
+
         if (other.gameObject.CompareTag("Powerup"))
         {
             Destroy(other.gameObject);
@@ -85,6 +117,47 @@ public class PlayerControllerX : MonoBehaviour
 
 
         }
+    }
+
+    IEnumerator SmashAttack()
+    {
+        isSmashing = true;
+
+        // Jump up
+        playerRb.AddForce(Vector3.up * smashJumpForce, ForceMode.Impulse);
+
+        yield return new WaitForSeconds(0.4f);
+
+        // Slam down
+        playerRb.AddForce(Vector3.down * smashDownForce, ForceMode.Impulse);
+
+        yield return new WaitForSeconds(0.2f);
+
+        // Detect nearby enemies
+        Collider[] enemies = Physics.OverlapSphere(transform.position, smashRadius);
+
+        foreach (Collider enemy in enemies)
+        {
+            if (enemy.CompareTag("Enemy"))
+            {
+                Rigidbody enemyRb = enemy.GetComponent<Rigidbody>();
+
+                if (enemyRb != null)
+                {
+                    enemyRb.AddExplosionForce(smashForce, transform.position, smashRadius, 1f, ForceMode.Impulse);
+                }
+            }
+        }
+
+        hasSmashPowerup = false;
+        isSmashing = false;
+        smashShield.SetActive(false);
+    }
+
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, smashRadius);
     }
 
 
