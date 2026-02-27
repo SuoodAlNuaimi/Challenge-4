@@ -1,46 +1,77 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class EnemyX : MonoBehaviour
 {
-    public float speed;
+   
+    [Header("AI Settings")]
+    public EnemyType enemyType;
+
     private Rigidbody enemyRb;
     private GameObject playerGoal;
+    private GameObject player;
 
-    private SpawnManagerX spawnManagerXScript;
+    private float baseSpeed;
+    private float currentSpeed;
 
-    // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
         enemyRb = GetComponent<Rigidbody>();
-        playerGoal = GameObject.Find("Player Goal");
-        spawnManagerXScript = GameObject.Find("Spawn Manager").GetComponent<SpawnManagerX>();
-        speed = Random.Range(2, 5);
 
+        playerGoal = GameObject.Find("Player Goal");
+        player = GameObject.FindGameObjectWithTag("Player");
+
+        baseSpeed = Random.Range(2f, 4f);
+
+        // Wave scaling
+        int wave = FindObjectOfType<SpawnManagerX>().CurrentWave;
+        currentSpeed = baseSpeed + (wave * 0.5f);
     }
 
-    // Update is called once per frame
-    void Update()
+    private void FixedUpdate()
     {
-        // Set enemy direction towards player goal and move there
-        Vector3 lookDirection = (playerGoal.transform.position - transform.position).normalized;
-        enemyRb.AddForce(lookDirection * speed * Time.deltaTime);
+        HandleBehavior();
+    }
 
+    private void HandleBehavior()
+    {
+        switch (enemyType)
+        {
+            case EnemyType.Aggressive:
+                MoveTowards(player.transform.position);
+                break;
+
+            case EnemyType.Defensive:
+                MoveTowards(playerGoal.transform.position);
+                break;
+
+            case EnemyType.Evasive:
+                MoveEvasive();
+                break;
+        }
+    }
+
+    private void MoveTowards(Vector3 target)
+    {
+        Vector3 direction = (target - transform.position).normalized;
+        enemyRb.AddForce(direction * currentSpeed, ForceMode.Force);
+    }
+
+    private void MoveEvasive()
+    {
+        Vector3 toPlayer = (player.transform.position - transform.position).normalized;
+
+        // Move sideways relative to player
+        Vector3 sideDirection = Vector3.Cross(toPlayer, Vector3.up);
+
+        enemyRb.AddForce((toPlayer + sideDirection).normalized * currentSpeed, ForceMode.Force);
     }
 
     private void OnCollisionEnter(Collision other)
     {
-        // If enemy collides with either goal, destroy it
-        if (other.gameObject.name == "Enemy Goal")
-        {
-            Destroy(gameObject);
-        } 
-        else if (other.gameObject.name == "Player Goal")
+        if (other.gameObject.name == "Enemy Goal" ||
+            other.gameObject.name == "Player Goal")
         {
             Destroy(gameObject);
         }
-
     }
-
 }

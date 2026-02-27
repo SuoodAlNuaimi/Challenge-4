@@ -16,7 +16,7 @@ public class SpawnManagerX : MonoBehaviour
 
     private int waveCount = 1;
     private bool waveActive;
-
+    public int CurrentWave => waveCount;
     private void Update()
     {
         if (!waveActive && GameObject.FindGameObjectsWithTag("Enemy").Length == 0)
@@ -42,7 +42,12 @@ public class SpawnManagerX : MonoBehaviour
     {
         for (int i = 0; i < count; i++)
         {
-            Instantiate(enemyPrefab, GenerateSpawnPosition(), Quaternion.identity);
+            GameObject enemy = Instantiate(enemyPrefab, GenerateSpawnPosition(), Quaternion.identity);
+
+            EnemyX enemyScript = enemy.GetComponent<EnemyX>();
+
+            // Random AI type
+            enemyScript.enemyType = (EnemyType)Random.Range(0, 3);
         }
     }
 
