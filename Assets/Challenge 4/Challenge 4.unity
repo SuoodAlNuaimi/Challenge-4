@@ -553,8 +553,16 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4392870381175910774, guid: 6562db3a873684fa9b7da3aef8329d82, type: 3}
+      propertyPath: stopAction
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4392870381175910774, guid: 6562db3a873684fa9b7da3aef8329d82, type: 3}
       propertyPath: lengthInSec
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4392870381175910774, guid: 6562db3a873684fa9b7da3aef8329d82, type: 3}
+      propertyPath: simulationSpeed
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 4392870381195268594, guid: 6562db3a873684fa9b7da3aef8329d82, type: 3}
       propertyPath: m_LocalScale.x
@@ -611,6 +619,10 @@ PrefabInstance:
     - target: {fileID: 4392870381195481524, guid: 6562db3a873684fa9b7da3aef8329d82, type: 3}
       propertyPath: m_Name
       value: Smoke_Particle
+      objectReference: {fileID: 0}
+    - target: {fileID: 4392870381195481524, guid: 6562db3a873684fa9b7da3aef8329d82, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -775,11 +787,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemyPrefab: {fileID: 8932280921958007952, guid: 47045ccb8f3944b9b8a55f6b07f0aefc, type: 3}
-  powerupPrefab: {fileID: 4446131693967519089, guid: c5497424856514b2ba61b78375567988, type: 3}
+  normalPowerupPrefab: {fileID: 4446131693967519089, guid: c5497424856514b2ba61b78375567988, type: 3}
   smashPowerupPrefab: {fileID: 480280073796896163, guid: 64cff19140a601b41a2236aec3b15a70, type: 3}
-  enemyCount: 0
-  waveCount: 1
-  enemySpeed: 50
+  spawnRangeX: 10
+  spawnZMin: 15
+  spawnZMax: 25
   player: {fileID: 583048338}
 --- !u!1 &254135234
 GameObject:
@@ -1652,7 +1664,7 @@ GameObject:
   - component: {fileID: 583048344}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1790,14 +1802,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5036a60f22d8542ca830e4578804462b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hasPowerup: 0
-  powerupIndicator: {fileID: 1427939658}
-  powerUpDuration: 5
-  smashShield: {fileID: 1065180698}
-  smashJumpForce: 15
+  moveForce: 500
+  turboBoostForce: 10
+  powerupDuration: 10
+  normalHitForce: 10
+  poweredHitForce: 25
+  smashJumpForce: 20
   smashDownForce: 30
   smashRadius: 20
-  smashForce: 40
+  smashMaxForce: 40
+  powerupIndicator: {fileID: 1427939658}
+  smashShield: {fileID: 1065180698}
   turboSmoke: {fileID: 1823973660}
 --- !u!1 &668039933
 GameObject:
@@ -3371,7 +3386,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1065180699
 Transform:
   m_ObjectHideFlags: 0
@@ -4760,7 +4775,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1564490617
 MonoBehaviour:
   m_ObjectHideFlags: 0
