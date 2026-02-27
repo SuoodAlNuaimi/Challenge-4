@@ -159,9 +159,9 @@ public class PlayerControllerX : MonoBehaviour
         rb.linearVelocity = Vector3.zero;
         rb.AddForce(Vector3.down * smashDownForce, ForceMode.Impulse);
         yield return new WaitForSeconds(0.2f);
-
-        turboSmoke?.Play();
-
+        // Activate and play particle on landing
+        turboSmoke.gameObject.SetActive(true);
+        turboSmoke.Play();
         ApplySmashImpact();
 
         isSmashing = false;
