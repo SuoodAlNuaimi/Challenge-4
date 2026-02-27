@@ -151,16 +151,19 @@ public class PlayerControllerX : MonoBehaviour
     {
         isSmashing = true;
 
+        rb.linearVelocity = Vector3.zero;
+
         rb.AddForce(Vector3.up * smashJumpForce, ForceMode.Impulse);
         yield return new WaitForSeconds(0.4f);
 
+        rb.linearVelocity = Vector3.zero;
         rb.AddForce(Vector3.down * smashDownForce, ForceMode.Impulse);
         yield return new WaitForSeconds(0.2f);
-        turboSmoke.Play();
+
+        turboSmoke?.Play();
+
         ApplySmashImpact();
 
-        hasSmashPowerup = false;
-        smashShield.SetActive(false);
         isSmashing = false;
     }
 

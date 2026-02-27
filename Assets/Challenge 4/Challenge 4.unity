@@ -1678,7 +1678,7 @@ MonoBehaviour:
   powerupDuration: 20
   normalHitForce: 10
   poweredHitForce: 25
-  smashJumpForce: 15
+  smashJumpForce: 20
   smashDownForce: 30
   smashRadius: 20
   smashMaxForce: 40
