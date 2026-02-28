@@ -30,7 +30,13 @@ public class SpawnManagerX : MonoBehaviour
         waveActive = true;
 
         SpawnPowerups();
-        SpawnEnemies(waveCount);
+        // Base enemy count on wave number
+        int enemyCount = waveCount;
+
+        if (GameSettings.ExtraEnemyPerWave)
+            enemyCount += 1;
+
+        SpawnEnemies(enemyCount);
 
         waveCount++;
         ResetPlayerPosition();
