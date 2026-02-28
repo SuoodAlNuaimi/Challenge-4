@@ -33,6 +33,9 @@ public class PlayerControllerX : MonoBehaviour
     private Coroutine normalPowerupRoutine;
     private Coroutine smashPowerupRoutine;
 
+    private float normalPowerTimeRemaining;
+    private float smashPowerTimeRemaining;
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -43,14 +46,16 @@ public class PlayerControllerX : MonoBehaviour
     {
         smashShield.SetActive(false);
         powerupIndicator.SetActive(false);
+    }
 
+    public void OnGameStart()
+    {
         // Apply difficulty settings
         moveForce = GameSettings.PlayerMoveForce;
         turboBoostForce = GameSettings.TurboForce;
         powerupDuration = GameSettings.PowerupDuration;
         smashRadius *= GameSettings.SmashRadiusMultiplier;
     }
-
     private void Update()
     {
         HandleMovement();
@@ -111,12 +116,25 @@ public class PlayerControllerX : MonoBehaviour
             StopCoroutine(normalPowerupRoutine);
 
         hasNormalPowerup = true;
+        normalPowerTimeRemaining = powerupDuration;
+
         powerupIndicator.SetActive(true);
-        normalPowerupRoutine = StartCoroutine(PowerupTimer(() =>
+        UIManager.Instance.SetNormalPowerStatus(true);
+
+        normalPowerupRoutine = StartCoroutine(NormalPowerRoutine());
+    }
+    private IEnumerator NormalPowerRoutine()
+    {
+        while (normalPowerTimeRemaining > 0)
         {
-            hasNormalPowerup = false;
-            powerupIndicator.SetActive(false);
-        }));
+            normalPowerTimeRemaining -= Time.deltaTime;
+            UIManager.Instance.UpdateNormalPowerSlider(normalPowerTimeRemaining / powerupDuration);
+            yield return null;
+        }
+
+        hasNormalPowerup = false;
+        powerupIndicator.SetActive(false);
+        UIManager.Instance.SetNormalPowerStatus(false);
     }
 
     private void ActivateSmashPowerup()
@@ -125,13 +143,26 @@ public class PlayerControllerX : MonoBehaviour
             StopCoroutine(smashPowerupRoutine);
 
         hasSmashPowerup = true;
-        smashShield.SetActive(true);
+        smashPowerTimeRemaining = powerupDuration;
 
-        smashPowerupRoutine = StartCoroutine(PowerupTimer(() =>
+        smashShield.SetActive(true);
+        UIManager.Instance.SetSmashPowerStatus(true);
+
+        smashPowerupRoutine = StartCoroutine(SmashPowerRoutine());
+    }
+
+    private IEnumerator SmashPowerRoutine()
+    {
+        while (smashPowerTimeRemaining > 0)
         {
-            hasSmashPowerup = false;
-            smashShield.SetActive(false);
-        }));
+            smashPowerTimeRemaining -= Time.deltaTime;
+            UIManager.Instance.UpdateSmashPowerSlider(smashPowerTimeRemaining / powerupDuration);
+            yield return null;
+        }
+
+        hasSmashPowerup = false;
+        smashShield.SetActive(false);
+        UIManager.Instance.SetSmashPowerStatus(false);
     }
 
     private IEnumerator PowerupTimer(System.Action onEnd)

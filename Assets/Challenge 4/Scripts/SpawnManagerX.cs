@@ -19,6 +19,7 @@ public class SpawnManagerX : MonoBehaviour
     public int CurrentWave => waveCount;
     private void Update()
     {
+        if (!UIManager.Instance.isGameStarted) return;
         if (!waveActive && GameObject.FindGameObjectsWithTag("Enemy").Length == 0)
         {
             SpawnWave();

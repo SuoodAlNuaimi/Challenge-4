@@ -136,9 +136,14 @@ public class EnemyX : MonoBehaviour
 
     private void OnCollisionEnter(Collision other)
     {
-        if (other.gameObject.name == "Enemy Goal" ||
-            other.gameObject.name == "Player Goal")
+        if (other.gameObject.name == "Player Goal")
         {
+            UIManager.Instance.AddEnemyScore();
+            Destroy(gameObject);
+        }
+        if (other.gameObject.name == "Enemy Goal")
+        {
+            UIManager.Instance.AddPlayerScore();
             Destroy(gameObject);
         }
     }
