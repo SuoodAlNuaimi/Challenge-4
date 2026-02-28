@@ -2,6 +2,11 @@ using UnityEngine;
 
 public class DifficultyConfigurator : MonoBehaviour
 {
+    public GameObject ground;
+    public Material easyMaterial;
+    public Material mediumMaterial;
+    public Material hardMaterial;
+
     public void SetEasy()
     {
         GameSettings.CurrentDifficulty = Difficulty.Easy;
@@ -20,6 +25,8 @@ public class DifficultyConfigurator : MonoBehaviour
 
         // Spawn
         GameSettings.ExtraEnemyPerWave = false;
+
+        ground.GetComponent<Renderer>().material = easyMaterial;
     }
 
     public void SetMedium()
@@ -37,6 +44,7 @@ public class DifficultyConfigurator : MonoBehaviour
         GameSettings.InterceptPredictionMultiplier = 0.5f;
 
         GameSettings.ExtraEnemyPerWave = false;
+        ground.GetComponent<Renderer>().material = mediumMaterial;
     }
 
     public void SetHard()
@@ -54,5 +62,6 @@ public class DifficultyConfigurator : MonoBehaviour
         GameSettings.InterceptPredictionMultiplier = 1f;
 
         GameSettings.ExtraEnemyPerWave = true;
+        ground.GetComponent<Renderer>().material = hardMaterial;
     }
 }

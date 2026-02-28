@@ -40,7 +40,13 @@ public class EnemyX : MonoBehaviour
         spawnManager = FindObjectOfType<SpawnManagerX>();
 
         baseSpeed = Random.Range(3f, 4.5f);
-        currentSpeed = Mathf.Min(baseSpeed + (spawnManager.CurrentWave * 0.25f), 7f);
+        // apply according to the game type and current wave
+        currentSpeed = Mathf.Min(
+            baseSpeed + (spawnManager.CurrentWave * GameSettings.EnemySpeedMultiplier),
+            GameSettings.EnemyMaxSpeed
+        );
+
+        decisionRate = GameSettings.EnemyDecisionRate;
 
         currentState = AIState.Attack;
     }
@@ -108,7 +114,7 @@ public class EnemyX : MonoBehaviour
     private Vector3 PredictPlayerPosition()
     {
         // Predict where player will be shortly
-        Vector3 futurePos = player.position + playerRb.linearVelocity * 0.5f;
+        Vector3 futurePos = player.position + playerRb.linearVelocity * GameSettings.InterceptPredictionMultiplier;
         return futurePos;
     }
 

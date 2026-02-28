@@ -43,6 +43,12 @@ public class PlayerControllerX : MonoBehaviour
     {
         smashShield.SetActive(false);
         powerupIndicator.SetActive(false);
+
+        // Apply difficulty settings
+        moveForce = GameSettings.PlayerMoveForce;
+        turboBoostForce = GameSettings.TurboForce;
+        powerupDuration = GameSettings.PowerupDuration;
+        smashRadius *= GameSettings.SmashRadiusMultiplier;
     }
 
     private void Update()
