@@ -100,12 +100,14 @@ public class PlayerControllerX : MonoBehaviour
         if (other.CompareTag("Powerup"))
         {
             ActivateNormalPowerup();
+            SoundsController.Instance.PlayPowerup();
             Destroy(other.gameObject);
         }
 
         if (other.CompareTag("SmashPowerup"))
         {
             ActivateSmashPowerup();
+            SoundsController.Instance.PlayPowerup();
             Destroy(other.gameObject);
         }
     }
@@ -182,6 +184,8 @@ public class PlayerControllerX : MonoBehaviour
         float force = hasNormalPowerup ? poweredHitForce : normalHitForce;
 
         enemyRb.AddForce(direction.normalized * force, ForceMode.Impulse);
+
+        SoundsController.Instance.PlayBallHit();
     }
 
     private IEnumerator SmashAttack()
@@ -200,7 +204,7 @@ public class PlayerControllerX : MonoBehaviour
         turboSmoke.gameObject.SetActive(true);
         turboSmoke.Play();
         ApplySmashImpact();
-
+        SoundsController.Instance.PlayLand();
         isSmashing = false;
     }
 
