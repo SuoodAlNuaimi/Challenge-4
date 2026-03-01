@@ -41,7 +41,10 @@ public class SpawnManagerX : MonoBehaviour
 
         waveCount++;
         ResetPlayerPosition();
-
+        if (waveCount > 1)
+        {
+            UIManager.Instance.ShowNewWaveUI(waveCount);
+        }
         waveActive = false;
     }
 

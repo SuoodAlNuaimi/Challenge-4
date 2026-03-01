@@ -2098,7 +2098,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 0, y: 36.2}
+  m_AnchoredPosition: {x: 0, y: 36.19995}
   m_SizeDelta: {x: 635.7, y: 120}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &407029336
@@ -2240,7 +2240,7 @@ RectTransform:
   m_Father: {fileID: 1384817374}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -2589,7 +2589,7 @@ RectTransform:
   m_Father: {fileID: 2005590394}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -2664,7 +2664,7 @@ RectTransform:
   m_Father: {fileID: 847384121}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -3733,15 +3733,14 @@ MonoBehaviour:
 
     Up Arrow - Move Forward
 
-    Left / Right
-    Arrow - Rotate Direction
+    Left / Right Arrow
+    - Rotate Direction
 
     </color>
 
-    
 
-    <size=135%><color=#00E0B8><b>POWER
-    ABILITIES</b></color></size>
+
+    <size=135%><color=#00E0B8><b>POWER ABILITIES</b></color></size>
 
     <color=#FFA500>------------</color>
 
@@ -3754,7 +3753,7 @@ MonoBehaviour:
 
     </color>
 
-    
+
 
     <size=135%><color=#00E0B8><b>POWER-UPS</b></color></size>
 
@@ -3770,7 +3769,7 @@ MonoBehaviour:
 
     </color>
 
-    
+
 
     <size=135%><color=#00E0B8><b>GAME
     OBJECTIVE</b></color></size>
@@ -3782,12 +3781,12 @@ MonoBehaviour:
     Push
     enemy balls into the Enemy Goal to score
 
-    Prevent enemies from entering
-    your goal
+    Prevent enemies from entering your
+    goal
 
     </color>
 
-    
+
 
     <size=135%><color=#00E0B8><b>MATCH TIMER</b></color></size>
 
@@ -3800,7 +3799,7 @@ MonoBehaviour:
 
     </color>
 
-    
+
 
     <size=135%><color=#00E0B8><b>DIFFICULTY
     MODES</b></color></size>
@@ -4088,6 +4087,8 @@ MonoBehaviour:
   smashPowerSlider: {fileID: 329506422}
   normalPowerUpStatus: {fileID: 1385191345}
   smashPowerUpStatus: {fileID: 269224024}
+  newWaveUI: {fileID: 1984645512}
+  newWaveText: {fileID: 931491935}
   gameStatusText: {fileID: 1952419552}
   isGameStarted: 0
   gameTimer: {fileID: 1847872983}
@@ -4980,7 +4981,7 @@ GameObject:
   - component: {fileID: 931491936}
   - component: {fileID: 931491935}
   m_Layer: 5
-  m_Name: Text
+  m_Name: Text_wave
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5989,7 +5990,7 @@ RectTransform:
   m_Father: {fileID: 1598335607}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -9291,7 +9292,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1793595270
 RectTransform:
   m_ObjectHideFlags: 0
@@ -10250,7 +10251,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1964175799
 RectTransform:
   m_ObjectHideFlags: 0

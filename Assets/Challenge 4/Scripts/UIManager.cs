@@ -21,6 +21,8 @@ public class UIManager : MonoBehaviour
     public Slider smashPowerSlider;
     public TMP_Text normalPowerUpStatus; // active or cooldown
     public TMP_Text smashPowerUpStatus; // active or cooldown
+    public GameObject newWaveUI;
+    public TMP_Text newWaveText;
 
     [Header("Game Over UIs")]
     public TMP_Text gameStatusText;
@@ -33,6 +35,8 @@ public class UIManager : MonoBehaviour
     private int playerScoreValue = 0;
     private int enemyScoreValue = 0;
 
+    public int GetPlayerScore() => playerScoreValue;
+    public int GetEnemyScore() => enemyScoreValue;
     public void Awake()
     {
         Instance= this;
@@ -137,5 +141,17 @@ public class UIManager : MonoBehaviour
     {
         smashPowerUpStatus.text = active ? "ACTIVE" : "READY";
         smashPowerHint.SetActive(active);
+    }
+
+    public void ShowNewWaveUI(int waveNumber)
+    {
+        newWaveUI.SetActive(true);
+        newWaveText.text = " New Wave Start : " + waveNumber;
+        Invoke("HideNewWaveUI", 1.5f); // Hide after 1.5 seconds
+    }
+
+    private void HideNewWaveUI()
+    {
+        newWaveUI.SetActive(false);
     }
 }

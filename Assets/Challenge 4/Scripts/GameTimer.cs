@@ -51,8 +51,8 @@ public class GameTimer : MonoBehaviour
         Time.timeScale = 0f;
 
         // Decide winner based on score
-        int playerScore = int.Parse(uiManager.player_Score.text);
-        int enemyScore = int.Parse(uiManager.enemy_Score.text);
+        int playerScore = uiManager.GetPlayerScore();
+        int enemyScore = uiManager.GetEnemyScore();
 
         bool playerWon = playerScore >= enemyScore;
 
