@@ -26,8 +26,9 @@ public class PlayerControllerX : MonoBehaviour
     [SerializeField] private GameObject smashShield;
     [SerializeField] private ParticleSystem turboSmoke;
 
-    private Rigidbody rb;
-    private Transform focalPoint;
+    [Header("Reference")]
+    [SerializeField] private Rigidbody rb;
+    [SerializeField] private Transform focalPoint;
 
     private bool hasNormalPower;
     private bool hasSmashPower;
@@ -38,8 +39,10 @@ public class PlayerControllerX : MonoBehaviour
 
     private void Awake()
     {
-        rb = GetComponent<Rigidbody>();
-        focalPoint = GameObject.Find("Focal Point").transform;
+        if(rb==null)
+            rb = GetComponent<Rigidbody>();
+        if(focalPoint==null)
+            focalPoint = GameObject.Find("Focal Point").transform;
     }
 
     private void Start()
