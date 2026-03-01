@@ -14,6 +14,11 @@ public class SettingsUI : MonoBehaviour
     public Image soundsOnSprite;
     public Image soundsOffSprite;
 
+    public void Awake()
+    {
+        musicButton.onClick.AddListener(ToggleMusic);
+        soundsButton.onClick.AddListener(ToggleSounds);
+    }
     private void OnEnable()
     {
         UpdateUI();

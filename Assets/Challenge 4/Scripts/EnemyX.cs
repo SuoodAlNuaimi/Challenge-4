@@ -144,7 +144,6 @@ public class EnemyX : MonoBehaviour
         if (other.gameObject.name == "Enemy Goal")
         {
             UIManager.Instance.AddPlayerScore();
-            SoundsController.Instance.PlayGoal();
             Destroy(gameObject);
         }
     }

@@ -134,6 +134,7 @@ public class UIManager : MonoBehaviour
     {
         playerScoreValue++;
         player_Score.text = "Player: "+playerScoreValue.ToString();
+        SoundsController.Instance.PlayGoal();
     }
 
     public void AddEnemyScore()
