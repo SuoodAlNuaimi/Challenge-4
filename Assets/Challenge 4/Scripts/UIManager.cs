@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
@@ -105,6 +106,10 @@ public class UIManager : MonoBehaviour
         gameOverPanel.SetActive(false);
     }
 
+    public void ReloadGame()
+    {
+        SceneManager.LoadScene(0);
+    }
     public void Exit()
     {
         Application.Quit();
@@ -143,10 +148,10 @@ public class UIManager : MonoBehaviour
         smashPowerHint.SetActive(active);
     }
 
-    public void ShowNewWaveUI(int waveNumber)
+    public void ShowNewWaveUI()
     {
         newWaveUI.SetActive(true);
-        newWaveText.text = " New Wave Start : " + waveNumber;
+        newWaveText.text = " New Wave Start !";
         Invoke("HideNewWaveUI", 1.5f); // Hide after 1.5 seconds
     }
 
