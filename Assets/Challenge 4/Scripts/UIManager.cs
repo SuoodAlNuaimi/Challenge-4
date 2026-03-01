@@ -12,6 +12,7 @@ public class UIManager : MonoBehaviour
     public GameObject inGamePanel;
     public GameObject gameOverPanel;
     public GameObject helpPanel;
+    public GameObject settingsPanel;
 
     [Header("In Game UIs")]
     public TMP_Text timerText;
@@ -61,6 +62,7 @@ public class UIManager : MonoBehaviour
         difficultyPanel.SetActive(false);
         inGamePanel.SetActive(false);
         gameOverPanel.SetActive(false);
+        settingsPanel.SetActive(false);
         helpPanel.SetActive(true);
     }
 
@@ -70,6 +72,7 @@ public class UIManager : MonoBehaviour
         difficultyPanel.SetActive(true);
         inGamePanel.SetActive(false);
         helpPanel.SetActive(false);
+        settingsPanel.SetActive(false);
         gameOverPanel.SetActive(false);
     }
 
@@ -80,6 +83,7 @@ public class UIManager : MonoBehaviour
         inGamePanel.SetActive(true);
         helpPanel.SetActive(false);
         gameOverPanel.SetActive(false);
+        settingsPanel.SetActive(false);
         Time.timeScale = 1f;
         isGameStarted = true;
         gameTimer.StartTimer();
@@ -93,6 +97,7 @@ public class UIManager : MonoBehaviour
         difficultyPanel.SetActive(false);
         inGamePanel.SetActive(false);
         helpPanel.SetActive(false);
+        settingsPanel.SetActive(false);
         gameOverPanel.SetActive(true);
         gameStatusText.text = playerWon ? "You Win!" : "You Lose!";
     }
@@ -103,9 +108,18 @@ public class UIManager : MonoBehaviour
         difficultyPanel.SetActive(false);
         inGamePanel.SetActive(false);
         helpPanel.SetActive(false);
+        settingsPanel.SetActive(false);
         gameOverPanel.SetActive(false);
     }
-
+    public void ShowSettingsPanel()
+    {
+        mainMenuPanel.SetActive(false);
+        difficultyPanel.SetActive(false);
+        inGamePanel.SetActive(false);
+        helpPanel.SetActive(false);
+        settingsPanel.SetActive(true);
+        gameOverPanel.SetActive(false);
+    }
     public void ReloadGame()
     {
         SceneManager.LoadScene(0);
