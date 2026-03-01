@@ -10369,10 +10369,12 @@ MonoBehaviour:
     Pink Power-Up - Enables
     Smash ability that launches nearby enemies
 
+    Blue Power-Up - Freeze enemies
+    for 3 seconds
+
     </color>
 
-    <size=135%><color=#00E0B8><b>GAME
-    OBJECTIVE</b></color></size>
+    <size=135%><color=#00E0B8><b>GAME OBJECTIVE</b></color></size>
 
     <color=#FFA500>------------</color>
 
