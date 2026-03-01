@@ -2,60 +2,50 @@
 
 public class EnemyX : MonoBehaviour
 {
-    private enum AIState
-    {
-        Attack,
-        Intercept,
-        Score
-    }
+    private enum AIState { Attack, Intercept, Score }
 
-    [Header("AI Personality")]
+    [Header("AI")]
+    [SerializeField] private float steeringStrength = 0.2f;
+    [SerializeField] private float steeringSpeed = 2f;
+
     public EnemyType enemyType;
 
     private Rigidbody rb;
     private Rigidbody playerRb;
-
     private Transform player;
     private Transform playerGoal;
 
     private AIState currentState;
-
-    private float baseSpeed;
     private float currentSpeed;
-
+    private float decisionRate;
     private float decisionTimer;
-    private float decisionRate = 0.25f;
 
-    private SpawnManagerX spawnManager;
     private bool isFrozen;
+
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
 
         player = GameObject.FindGameObjectWithTag("Player").transform;
         playerRb = player.GetComponent<Rigidbody>();
-
         playerGoal = GameObject.Find("Player Goal").transform;
 
-        spawnManager = FindObjectOfType<SpawnManagerX>();
+        SpawnManagerX spawner = FindObjectOfType<SpawnManagerX>();
 
-        baseSpeed = Random.Range(3f, 4.5f);
-        // apply according to the game type and current wave
+        float baseSpeed = Random.Range(3f, 4.5f);
         currentSpeed = Mathf.Min(
-            baseSpeed + (spawnManager.CurrentWave * GameSettings.EnemySpeedMultiplier),
+            baseSpeed + (spawner.CurrentWave * GameSettings.EnemySpeedMultiplier),
             GameSettings.EnemyMaxSpeed
         );
 
         decisionRate = GameSettings.EnemyDecisionRate;
-
-        currentState = AIState.Attack;
     }
 
     private void FixedUpdate()
     {
         if (isFrozen) return;
-        decisionTimer += Time.fixedDeltaTime;
 
+        decisionTimer += Time.fixedDeltaTime;
         if (decisionTimer >= decisionRate)
         {
             DecideState();
@@ -64,84 +54,69 @@ public class EnemyX : MonoBehaviour
 
         ExecuteState();
     }
+
     public void Freeze(bool value)
     {
         isFrozen = value;
 
-        if (isFrozen)
+        if (value)
         {
             rb.linearVelocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
         }
     }
+
     private void DecideState()
     {
-        float distToPlayer = Vector3.Distance(transform.position, player.position);
-        float distToGoal = Vector3.Distance(transform.position, playerGoal.position);
+        float distGoal = Vector3.Distance(transform.position, playerGoal.position);
 
-        // Close to goal → try to score
-        if (distToGoal < 7f)
+        if (distGoal < 7f)
         {
             currentState = AIState.Score;
             return;
         }
 
-        switch (enemyType)
+        currentState = enemyType switch
         {
-            case EnemyType.Aggressive:
-                currentState = AIState.Attack;
-                break;
-
-            case EnemyType.Defensive:
-                currentState = AIState.Intercept;
-                break;
-
-            case EnemyType.Evasive:
-                currentState = distToPlayer < 5f ? AIState.Intercept : AIState.Attack;
-                break;
-        }
+            EnemyType.Aggressive => AIState.Attack,
+            EnemyType.Defensive => AIState.Intercept,
+            EnemyType.Evasive =>
+                Vector3.Distance(transform.position, player.position) < 5f
+                ? AIState.Intercept : AIState.Attack,
+            _ => AIState.Attack
+        };
     }
 
     private void ExecuteState()
     {
-        switch (currentState)
+        Vector3 target = currentState switch
         {
-            case AIState.Attack:
-                MoveSmart(player.position);
-                break;
+            AIState.Attack => player.position,
+            AIState.Intercept => PredictPosition(),
+            AIState.Score => playerGoal.position,
+            _ => player.position
+        };
 
-            case AIState.Intercept:
-                Vector3 predictedPos = PredictPlayerPosition();
-                MoveSmart(predictedPos);
-                break;
-
-            case AIState.Score:
-                MoveSmart(playerGoal.position);
-                break;
-        }
+        Move(target);
     }
 
-    private Vector3 PredictPlayerPosition()
+    private Vector3 PredictPosition()
     {
-        // Predict where player will be shortly
-        Vector3 futurePos = player.position + playerRb.linearVelocity * GameSettings.InterceptPredictionMultiplier;
-        return futurePos;
+        return player.position + playerRb.linearVelocity *
+               GameSettings.InterceptPredictionMultiplier;
     }
 
-    private void MoveSmart(Vector3 target)
+    private void Move(Vector3 target)
     {
         Vector3 direction = (target - transform.position).normalized;
 
-        // Slight natural steering
-        Vector3 steeringOffset = new Vector3(
-            Mathf.Sin(Time.time * 2f) * 0.2f,
+        Vector3 steering = new Vector3(
+            Mathf.Sin(Time.time * steeringSpeed) * steeringStrength,
             0,
-            Mathf.Cos(Time.time * 2f) * 0.2f
+            Mathf.Cos(Time.time * steeringSpeed) * steeringStrength
         );
 
-        Vector3 finalDir = (direction + steeringOffset).normalized;
-
-        rb.AddForce(finalDir * currentSpeed, ForceMode.Force);
+        rb.AddForce((direction + steering).normalized * currentSpeed);
     }
 
     private void OnCollisionEnter(Collision other)
@@ -151,7 +126,7 @@ public class EnemyX : MonoBehaviour
             UIManager.Instance.AddEnemyScore();
             Destroy(gameObject);
         }
-        if (other.gameObject.name == "Enemy Goal")
+        else if (other.gameObject.name == "Enemy Goal")
         {
             UIManager.Instance.AddPlayerScore();
             Destroy(gameObject);

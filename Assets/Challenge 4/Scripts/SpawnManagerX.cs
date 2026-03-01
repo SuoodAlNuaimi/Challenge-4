@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
 
 public class SpawnManagerX : MonoBehaviour
 {
@@ -12,40 +13,48 @@ public class SpawnManagerX : MonoBehaviour
     [SerializeField] private float spawnRangeX = 10f;
     [SerializeField] private float spawnZMin = 15f;
     [SerializeField] private float spawnZMax = 25f;
+    [SerializeField] private Vector3 powerupOffset = new Vector3(0, 0, -15);
 
+    [Header("References")]
     [SerializeField] private GameObject player;
 
     private int waveCount = 1;
     private bool waveActive;
+
     public int CurrentWave => waveCount;
+
     private void Update()
     {
-        if (!UIManager.Instance.isGameStarted) return;
-        if (!waveActive && GameObject.FindGameObjectsWithTag("Enemy").Length == 0)
-        {
+        if (!UIManager.Instance.isGameStarted || waveActive) return;
+
+        if (IsWaveCleared())
             SpawnWave();
-        }
+    }
+
+    private bool IsWaveCleared()
+    {
+        return GameObject.FindGameObjectsWithTag("Enemy").Length == 0;
     }
 
     private void SpawnWave()
     {
         waveActive = true;
 
-        SpawnPowerups();
-        // Base enemy count on wave number
-        int enemyCount = waveCount;
+        SpawnAllPowerups();
 
+        int enemyCount = waveCount;
         if (GameSettings.ExtraEnemyPerWave)
-            enemyCount += 1;
+            enemyCount++;
 
         SpawnEnemies(enemyCount);
 
         waveCount++;
-        ResetPlayerPosition();
+
+        ResetPlayer();
+
         if (waveCount > 1)
-        {
             UIManager.Instance.ShowNewWaveUI();
-        }
+
         waveActive = false;
     }
 
@@ -53,39 +62,35 @@ public class SpawnManagerX : MonoBehaviour
     {
         for (int i = 0; i < count; i++)
         {
-            GameObject enemy = Instantiate(enemyPrefab, GenerateSpawnPosition(), Quaternion.identity);
-
-            EnemyX enemyScript = enemy.GetComponent<EnemyX>();
-
-            // Random AI type
-            enemyScript.enemyType = (EnemyType)Random.Range(0, 3);
+            GameObject enemy = Instantiate(enemyPrefab, GetSpawnPosition(), Quaternion.identity);
+            enemy.GetComponent<EnemyX>().enemyType =
+                (EnemyType)Random.Range(0, System.Enum.GetValues(typeof(EnemyType)).Length);
         }
     }
 
-    private void SpawnPowerups()
+    private void SpawnAllPowerups()
     {
-        Vector3 offset = new Vector3(0, 0, -15);
-
-        if (GameObject.FindGameObjectsWithTag("Powerup").Length == 0)
-            Instantiate(normalPowerupPrefab, GenerateSpawnPosition() + offset, Quaternion.identity);
-
-        if (GameObject.FindGameObjectsWithTag("SmashPowerup").Length == 0)
-            Instantiate(smashPowerupPrefab, GenerateSpawnPosition() + offset, Quaternion.identity);
-
-        if (GameObject.FindGameObjectsWithTag("FreezePowerup").Length == 0)
-            Instantiate(freezeEnemyPowerupPrefab, GenerateSpawnPosition() + offset, Quaternion.identity);
+        TrySpawnPowerup("Powerup", normalPowerupPrefab);
+        TrySpawnPowerup("SmashPowerup", smashPowerupPrefab);
+        TrySpawnPowerup("FreezePowerup", freezeEnemyPowerupPrefab);
     }
 
-    private Vector3 GenerateSpawnPosition()
+    private void TrySpawnPowerup(string tag, GameObject prefab)
+    {
+        if (GameObject.FindGameObjectsWithTag(tag).Length == 0)
+            Instantiate(prefab, GetSpawnPosition() + powerupOffset, Quaternion.identity);
+    }
+
+    private Vector3 GetSpawnPosition()
     {
         float x = Random.Range(-spawnRangeX, spawnRangeX);
         float z = Random.Range(spawnZMin, spawnZMax);
-        return new Vector3(x, 0, z);
+        return new Vector3(x, 0f, z);
     }
 
-    private void ResetPlayerPosition()
+    private void ResetPlayer()
     {
-        player.transform.position = new Vector3(0, 1, -7);
+        player.transform.position = new Vector3(0f, 1f, -7f);
 
         Rigidbody rb = player.GetComponent<Rigidbody>();
         rb.linearVelocity = Vector3.zero;

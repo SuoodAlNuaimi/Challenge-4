@@ -7,8 +7,11 @@ public class PlayerControllerX : MonoBehaviour
     [SerializeField] private float moveForce = 500f;
     [SerializeField] private float turboBoostForce = 10f;
 
-    [Header("Powerup Settings")]
+    [Header("Power Settings")]
     [SerializeField] private float powerupDuration = 5f;
+    [SerializeField] private float freezeDuration = 3f;
+
+    [Header("Hit Forces")]
     [SerializeField] private float normalHitForce = 10f;
     [SerializeField] private float poweredHitForce = 25f;
 
@@ -24,69 +27,65 @@ public class PlayerControllerX : MonoBehaviour
     [SerializeField] private ParticleSystem turboSmoke;
 
     private Rigidbody rb;
-    private GameObject focalPoint;
+    private Transform focalPoint;
 
-    private bool hasNormalPowerup;
-    private bool hasSmashPowerup;
+    private bool hasNormalPower;
+    private bool hasSmashPower;
     private bool isSmashing;
 
-    private Coroutine normalPowerupRoutine;
-    private Coroutine smashPowerupRoutine;
-
-    private float normalPowerTimeRemaining;
-    private float smashPowerTimeRemaining;
+    private float normalTime;
+    private float smashTime;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
-        focalPoint = GameObject.Find("Focal Point");
+        focalPoint = GameObject.Find("Focal Point").transform;
     }
 
     private void Start()
     {
-        smashShield.SetActive(false);
         powerupIndicator.SetActive(false);
+        smashShield.SetActive(false);
     }
 
     public void OnGameStart()
     {
-        // Apply difficulty settings
         moveForce = GameSettings.PlayerMoveForce;
         turboBoostForce = GameSettings.TurboForce;
         powerupDuration = GameSettings.PowerupDuration;
         smashRadius *= GameSettings.SmashRadiusMultiplier;
     }
+
     private void Update()
     {
         HandleMovement();
         HandleInput();
         UpdateVisuals();
+        UpdatePowerTimers();
     }
 
     private void HandleMovement()
     {
-        float verticalInput = Input.GetAxis("Vertical");
-        rb.AddForce(focalPoint.transform.forward * verticalInput * moveForce * Time.deltaTime);
+        float input = Input.GetAxis("Vertical");
+        rb.AddForce(focalPoint.forward * input * moveForce * Time.deltaTime);
     }
 
     private void HandleInput()
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            rb.AddForce(focalPoint.transform.forward * turboBoostForce, ForceMode.Impulse);
+            rb.AddForce(focalPoint.forward * turboBoostForce, ForceMode.Impulse);
             turboSmoke?.Play();
         }
 
-        if (hasSmashPowerup && Input.GetKeyDown(KeyCode.F) && !isSmashing)
-        {
+        if (hasSmashPower && Input.GetKeyDown(KeyCode.F) && !isSmashing)
             StartCoroutine(SmashAttack());
-        }
     }
 
     private void UpdateVisuals()
     {
         if (powerupIndicator.activeSelf)
-            powerupIndicator.transform.position = transform.position + new Vector3(0, -0.6f, 0);
+            powerupIndicator.transform.position = transform.position + Vector3.down * 0.6f;
 
         if (smashShield.activeSelf)
         {
@@ -95,123 +94,89 @@ public class PlayerControllerX : MonoBehaviour
         }
     }
 
+    private void UpdatePowerTimers()
+    {
+        if (hasNormalPower)
+        {
+            normalTime -= Time.deltaTime;
+            UIManager.Instance.UpdateNormalPowerSlider(normalTime / powerupDuration);
+
+            if (normalTime <= 0f)
+                DisableNormalPower();
+        }
+
+        if (hasSmashPower)
+        {
+            smashTime -= Time.deltaTime;
+            UIManager.Instance.UpdateSmashPowerSlider(smashTime / powerupDuration);
+
+            if (smashTime <= 0f)
+                DisableSmashPower();
+        }
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Powerup"))
-        {
-            ActivateNormalPowerup();
-            SoundsController.Instance.PlayPowerup();
-            Destroy(other.gameObject);
-        }
+            ActivateNormalPower();
 
         if (other.CompareTag("SmashPowerup"))
-        {
-            ActivateSmashPowerup();
-            SoundsController.Instance.PlayPowerup();
-            Destroy(other.gameObject);
-        }
+            ActivateSmashPower();
 
         if (other.CompareTag("FreezePowerup"))
+            StartCoroutine(FreezeEnemies());
+
+        if (other.CompareTag("Powerup") ||
+            other.CompareTag("SmashPowerup") ||
+            other.CompareTag("FreezePowerup"))
         {
-            ActivateFreezePowerup();
             SoundsController.Instance.PlayPowerup();
             Destroy(other.gameObject);
         }
     }
 
-    private void ActivateNormalPowerup()
+    private void ActivateNormalPower()
     {
-        if (normalPowerupRoutine != null)
-            StopCoroutine(normalPowerupRoutine);
-
-        hasNormalPowerup = true;
-        normalPowerTimeRemaining = powerupDuration;
-
+        hasNormalPower = true;
+        normalTime = powerupDuration;
         powerupIndicator.SetActive(true);
         UIManager.Instance.SetNormalPowerStatus(true);
-
-        normalPowerupRoutine = StartCoroutine(NormalPowerRoutine());
     }
-    private IEnumerator NormalPowerRoutine()
-    {
-        while (normalPowerTimeRemaining > 0)
-        {
-            normalPowerTimeRemaining -= Time.deltaTime;
-            UIManager.Instance.UpdateNormalPowerSlider(normalPowerTimeRemaining / powerupDuration);
-            yield return null;
-        }
 
-        hasNormalPowerup = false;
+    private void DisableNormalPower()
+    {
+        hasNormalPower = false;
         powerupIndicator.SetActive(false);
         UIManager.Instance.SetNormalPowerStatus(false);
     }
 
-    private void ActivateSmashPowerup()
+    private void ActivateSmashPower()
     {
-        if (smashPowerupRoutine != null)
-            StopCoroutine(smashPowerupRoutine);
-
-        hasSmashPowerup = true;
-        smashPowerTimeRemaining = powerupDuration;
-
+        hasSmashPower = true;
+        smashTime = powerupDuration;
         smashShield.SetActive(true);
         UIManager.Instance.SetSmashPowerStatus(true);
-
-        smashPowerupRoutine = StartCoroutine(SmashPowerRoutine());
     }
 
-    private IEnumerator SmashPowerRoutine()
+    private void DisableSmashPower()
     {
-        while (smashPowerTimeRemaining > 0)
-        {
-            smashPowerTimeRemaining -= Time.deltaTime;
-            UIManager.Instance.UpdateSmashPowerSlider(smashPowerTimeRemaining / powerupDuration);
-            yield return null;
-        }
-
-        hasSmashPowerup = false;
+        hasSmashPower = false;
         smashShield.SetActive(false);
         UIManager.Instance.SetSmashPowerStatus(false);
     }
 
-    private IEnumerator PowerupTimer(System.Action onEnd)
-    {
-        yield return new WaitForSeconds(powerupDuration);
-        onEnd?.Invoke();
-    }
-    private void ActivateFreezePowerup()
-    {
-        StartCoroutine(FreezeEnemiesRoutine());
-    }
-    private IEnumerator FreezeEnemiesRoutine()
+    private IEnumerator FreezeEnemies()
     {
         UIManager.Instance.ShowFreezeHint(true);
 
         EnemyX[] enemies = FindObjectsOfType<EnemyX>();
+        foreach (var e in enemies) e.Freeze(true);
 
-        foreach (EnemyX enemy in enemies)
-            enemy.Freeze(true);
+        yield return new WaitForSeconds(freezeDuration);
 
-        yield return new WaitForSeconds(3f);
-
-        foreach (EnemyX enemy in enemies)
-            enemy.Freeze(false);
+        foreach (var e in enemies) e.Freeze(false);
 
         UIManager.Instance.ShowFreezeHint(false);
-    }
-    private void OnCollisionEnter(Collision collision)
-    {
-        if (!collision.gameObject.CompareTag("Enemy")) return;
-
-        Rigidbody enemyRb = collision.gameObject.GetComponent<Rigidbody>();
-        if (enemyRb == null) return;
-
-        Vector3 direction = collision.transform.position - transform.position;
-        float force = hasNormalPowerup ? poweredHitForce : normalHitForce;
-
-        enemyRb.AddForce(direction.normalized * force, ForceMode.Impulse);
-
-        SoundsController.Instance.PlayBallHit();
     }
 
     private IEnumerator SmashAttack()
@@ -219,18 +184,19 @@ public class PlayerControllerX : MonoBehaviour
         isSmashing = true;
 
         rb.linearVelocity = Vector3.zero;
-
         rb.AddForce(Vector3.up * smashJumpForce, ForceMode.Impulse);
         yield return new WaitForSeconds(0.4f);
 
         rb.linearVelocity = Vector3.zero;
         rb.AddForce(Vector3.down * smashDownForce, ForceMode.Impulse);
         yield return new WaitForSeconds(0.2f);
-        // Activate and play particle on landing
+
         turboSmoke.gameObject.SetActive(true);
         turboSmoke.Play();
+
         ApplySmashImpact();
         SoundsController.Instance.PlayLand();
+
         isSmashing = false;
     }
 
@@ -238,7 +204,7 @@ public class PlayerControllerX : MonoBehaviour
     {
         Collider[] hits = Physics.OverlapSphere(transform.position, smashRadius);
 
-        foreach (Collider hit in hits)
+        foreach (var hit in hits)
         {
             if (!hit.CompareTag("Enemy")) continue;
 
@@ -246,17 +212,24 @@ public class PlayerControllerX : MonoBehaviour
             if (enemyRb == null) continue;
 
             float distance = Vector3.Distance(transform.position, hit.transform.position);
-            float forcePercent = 1 - (distance / smashRadius);
-
+            float forcePercent = 1f - (distance / smashRadius);
             float finalForce = smashMaxForce * Mathf.Clamp01(forcePercent);
 
-            enemyRb.AddExplosionForce(finalForce, transform.position, smashRadius, 1f, ForceMode.Impulse);
+            enemyRb.AddExplosionForce(finalForce, transform.position, smashRadius);
         }
     }
 
-    private void OnDrawGizmosSelected()
+    private void OnCollisionEnter(Collision collision)
     {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, smashRadius);
+        if (!collision.gameObject.CompareTag("Enemy")) return;
+
+        Rigidbody enemyRb = collision.gameObject.GetComponent<Rigidbody>();
+        if (enemyRb == null) return;
+
+        Vector3 dir = (collision.transform.position - transform.position).normalized;
+        float force = hasNormalPower ? poweredHitForce : normalHitForce;
+
+        enemyRb.AddForce(dir * force, ForceMode.Impulse);
+        SoundsController.Instance.PlayBallHit();
     }
 }
