@@ -188,13 +188,14 @@ This project follows structured GitHub workflow:
 
 ## Branch Structure
 
-Example feature branches:
+feature branches:
 
 - feature/enemy-ai  
 - feature/ui-improvements  
 - feature/difficulty-system  
 - feature/powerups  
-- feature/audio-system  
+- feature/audio-system
+- feature/code-refactor
 
 ---
 
@@ -227,8 +228,7 @@ Conflicts were resolved by:
 - Reviewing merge differences before integration  
 - Controlled merging of feature branches into master  
 
-Example merge:
-
+ For Example merge:
 Merge branch 'master' into feature/ui-improvements  
 
 ---
