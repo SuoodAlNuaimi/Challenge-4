@@ -110,6 +110,13 @@ public class PlayerControllerX : MonoBehaviour
             SoundsController.Instance.PlayPowerup();
             Destroy(other.gameObject);
         }
+
+        if (other.CompareTag("FreezePowerup"))
+        {
+            ActivateFreezePowerup();
+            SoundsController.Instance.PlayPowerup();
+            Destroy(other.gameObject);
+        }
     }
 
     private void ActivateNormalPowerup()
@@ -172,7 +179,26 @@ public class PlayerControllerX : MonoBehaviour
         yield return new WaitForSeconds(powerupDuration);
         onEnd?.Invoke();
     }
+    private void ActivateFreezePowerup()
+    {
+        StartCoroutine(FreezeEnemiesRoutine());
+    }
+    private IEnumerator FreezeEnemiesRoutine()
+    {
+        UIManager.Instance.ShowFreezeHint(true);
 
+        EnemyX[] enemies = FindObjectsOfType<EnemyX>();
+
+        foreach (EnemyX enemy in enemies)
+            enemy.Freeze(true);
+
+        yield return new WaitForSeconds(3f);
+
+        foreach (EnemyX enemy in enemies)
+            enemy.Freeze(false);
+
+        UIManager.Instance.ShowFreezeHint(false);
+    }
     private void OnCollisionEnter(Collision collision)
     {
         if (!collision.gameObject.CompareTag("Enemy")) return;

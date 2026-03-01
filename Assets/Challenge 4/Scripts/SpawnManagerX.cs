@@ -6,6 +6,7 @@ public class SpawnManagerX : MonoBehaviour
     [SerializeField] private GameObject enemyPrefab;
     [SerializeField] private GameObject normalPowerupPrefab;
     [SerializeField] private GameObject smashPowerupPrefab;
+    [SerializeField] private GameObject freezeEnemyPowerupPrefab;
 
     [Header("Spawn Settings")]
     [SerializeField] private float spawnRangeX = 10f;
@@ -66,14 +67,13 @@ public class SpawnManagerX : MonoBehaviour
         Vector3 offset = new Vector3(0, 0, -15);
 
         if (GameObject.FindGameObjectsWithTag("Powerup").Length == 0)
-        {
             Instantiate(normalPowerupPrefab, GenerateSpawnPosition() + offset, Quaternion.identity);
-        }
 
         if (GameObject.FindGameObjectsWithTag("SmashPowerup").Length == 0)
-        {
             Instantiate(smashPowerupPrefab, GenerateSpawnPosition() + offset, Quaternion.identity);
-        }
+
+        if (GameObject.FindGameObjectsWithTag("FreezePowerup").Length == 0)
+            Instantiate(freezeEnemyPowerupPrefab, GenerateSpawnPosition() + offset, Quaternion.identity);
     }
 
     private Vector3 GenerateSpawnPosition()

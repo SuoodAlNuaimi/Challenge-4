@@ -27,7 +27,7 @@ public class EnemyX : MonoBehaviour
     private float decisionRate = 0.25f;
 
     private SpawnManagerX spawnManager;
-
+    private bool isFrozen;
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -53,6 +53,7 @@ public class EnemyX : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (isFrozen) return;
         decisionTimer += Time.fixedDeltaTime;
 
         if (decisionTimer >= decisionRate)
@@ -63,7 +64,16 @@ public class EnemyX : MonoBehaviour
 
         ExecuteState();
     }
+    public void Freeze(bool value)
+    {
+        isFrozen = value;
 
+        if (isFrozen)
+        {
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+        }
+    }
     private void DecideState()
     {
         float distToPlayer = Vector3.Distance(transform.position, player.position);

@@ -25,6 +25,7 @@ public class UIManager : MonoBehaviour
     public TMP_Text smashPowerUpStatus; // active or cooldown
     public GameObject newWaveUI;
     public TMP_Text newWaveText;
+    public GameObject freezeHint;
 
     [Header("Game Over UIs")]
     public TMP_Text gameStatusText;
@@ -173,5 +174,9 @@ public class UIManager : MonoBehaviour
     private void HideNewWaveUI()
     {
         newWaveUI.SetActive(false);
+    }
+    public void ShowFreezeHint(bool value)
+    {
+        freezeHint.SetActive(value);
     }
 }
